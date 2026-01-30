@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.preference.PreferenceManager
 import com.github.muellerma.coffee.tiles.TimeoutTile
 import com.github.muellerma.coffee.tiles.ToggleTile
+import com.github.muellerma.coffee.tiles.RefreshTile
 import com.google.android.material.color.DynamicColors
 import kotlin.time.Duration
 
@@ -21,6 +22,7 @@ class CoffeeApplication : Application() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             observers.add(ToggleTile.TileServiceStatusObserver(this))
             observers.add(TimeoutTile.TileServiceStatusObserver(this))
+            observers.add(RefreshTile.TileServiceStatusObserver(this))
         }
     }
 

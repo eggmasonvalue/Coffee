@@ -158,6 +158,32 @@ class ProgressNotificationManager(private val context: Context) {
             timeoutPendingIntent
         )
 
+        // Add refresh timeout action
+        val refreshIntent = Intent(context, ForegroundService::class.java).apply {
+            action = ForegroundService.ACTION_REFRESH_TIMEOUT
+        }
+        val refreshPendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            PendingIntent.getForegroundService(
+                context,
+                3,
+                refreshIntent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+        } else {
+            PendingIntent.getService(
+                context,
+                3,
+                refreshIntent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+        }
+
+        val refreshAction = NotificationCompat.Action(
+            R.drawable.ic_baseline_refresh_24,
+            context.getString(R.string.refresh_timeout),
+            refreshPendingIntent
+        )
+
         // Add dimming toggle action
         val dimmingIntent = Intent(context, ForegroundService::class.java).apply {
             action = ForegroundService.ACTION_CHANGE_PREF_ALLOW_DIMMING
@@ -191,6 +217,7 @@ class ProgressNotificationManager(private val context: Context) {
         )
 
         builder.addAction(timeoutAction)
+        builder.addAction(refreshAction)
         builder.addAction(dimmingAction)
     }
 

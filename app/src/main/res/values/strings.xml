@@ -28,6 +28,7 @@
     <string name="allow_dimming_enable">Enable dimming</string>
     <string name="allow_dimming_disable">Disable dimming</string>
     <string name="timeout_next">Next timeout</string>
+    <string name="refresh_timeout">Restart timer</string>
 
     <!-- Settings -->
     <string name="settings">Settings</string>

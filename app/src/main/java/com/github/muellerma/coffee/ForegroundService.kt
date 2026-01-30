@@ -48,6 +48,9 @@ class ForegroundService : Service(), ServiceStatusObserver {
                 Log.d(TAG, "Change timeout")
                 prefs.timeout = prefs.nextTimeout
             }
+            ACTION_REFRESH_TIMEOUT -> {
+                Log.d(TAG, "Refresh timeout")
+            }
             ACTION_CHANGE_PREF_ALLOW_DIMMING -> {
                 Log.d(TAG, "Change allow dimming")
                 prefs.allowDimming = !prefs.allowDimming
@@ -220,6 +223,7 @@ class ForegroundService : Service(), ServiceStatusObserver {
             .setContentText(getString(R.string.tap_to_turn_off))
             .setContentIntent(getPendingIntentForService(stopIntent, PendingIntent_Immutable, 0))
             .addAction(getTimeoutAction())
+            .addAction(getRefreshAction())
             .addAction(getDimmingAction(prefs))
             .setPublicVersion(getBaseNotification(title).build())
             .build()
@@ -253,6 +257,18 @@ class ForegroundService : Service(), ServiceStatusObserver {
         )
     }
 
+    private fun getRefreshAction(): NotificationCompat.Action {
+        Log.d(TAG, "getRefreshAction()")
+        val intent = Intent(this, ForegroundService::class.java).apply {
+            action = ACTION_REFRESH_TIMEOUT
+        }
+        return NotificationCompat.Action(
+            R.drawable.ic_baseline_refresh_24,
+            getString(R.string.refresh_timeout),
+            getPendingIntentForService(intent, PendingIntent_Immutable or PendingIntent.FLAG_UPDATE_CURRENT, 3)
+        )
+    }
+
     private fun getDimmingAction(prefs: Prefs): NotificationCompat.Action {
         val intent = Intent(this, ForegroundService::class.java).apply {
             action = ACTION_CHANGE_PREF_ALLOW_DIMMING
@@ -264,6 +280,8 @@ class ForegroundService : Service(), ServiceStatusObserver {
             getPendingIntentForService(intent, PendingIntent_Immutable or PendingIntent.FLAG_UPDATE_CURRENT, 2)
         )
     }
+
+
 
     private fun getPendingIntentForService(intent: Intent, flags: Int, requestCode: Int): PendingIntent {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -329,6 +347,7 @@ class ForegroundService : Service(), ServiceStatusObserver {
         private val TAG = ForegroundService::class.java.simpleName
         private const val ACTION_STOP = "stop_action"
         const val ACTION_CHANGE_PREF_TIMEOUT = "change_pref_timeout"
+        const val ACTION_REFRESH_TIMEOUT = "refresh_timeout"
         const val ACTION_CHANGE_PREF_ALLOW_DIMMING = "change_pref_dimming"
         const val NOTIFICATION_ID = 1
         const val NOTIFICATION_CHANNEL_ID = "foreground_service"
