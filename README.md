@@ -38,3 +38,20 @@ In that case please enable "Alternate mode" in the settings.
 ## Credits
 
 * Feature graphic by https://unsplash.com/@mukulwadhwa
+
+## AI Integration (AppFunctions)
+
+Starting with version 2.25, Coffee includes support for Android 16's AppFunctions! This allows AI assistants (like Gemini) and other authorized agent apps to control Coffee using natural language.
+
+### Supported Features
+You can ask your assistant to perform the following actions without opening the app:
+* **Turn On**: "Turn on Coffee" or "Keep my screen awake"
+* **Turn Off**: "Turn off Coffee"
+* **Toggle**: "Toggle my screen awake state"
+* **Check Status**: "Is Coffee running right now?"
+* **Set Timeout**: "Keep my screen awake for 30 minutes"
+
+### Technical Details
+This feature uses the experimental `androidx.appfunctions` Jetpack library. The `CoffeeAppFunctions` class exposes the capabilities, returning a `@AppFunctionSerializable` `CoffeeStatus` state.
+
+To use this programmatically or to discover it from an agent app, you must have the `android.permission.EXECUTE_APP_FUNCTIONS` permission. Coffee implements `CoffeeAppFunctionService` utilizing the KSP generated `AggregatedAppFunctionInvoker` bindings to safely execute your requests in the background.
