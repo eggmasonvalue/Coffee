@@ -9,11 +9,14 @@ import androidx.appfunctions.service.internal.AggregatedAppFunctionInvoker
 
 class CoffeeAppFunctionService : AppFunctionService() {
     private val delegate by lazy {
+        val inventoryName = "appfunctions_aggregated_deps.\$App" + if (BuildConfig.DEBUG) "Debug" else "Release" + "_InventoryComponentRegistry"
+        val invokerName = "appfunctions_aggregated_deps.\$App" + if (BuildConfig.DEBUG) "Debug" else "Release" + "_InvokerComponentRegistry"
+
         AppFunctionServiceDelegate(
             this,
             kotlinx.coroutines.Dispatchers.Main + kotlinx.coroutines.Job(),
-            appfunctions_aggregated_deps.`$AppDebug_InventoryComponentRegistry`() as AggregatedAppFunctionInventory,
-            appfunctions_aggregated_deps.`$AppDebug_InvokerComponentRegistry`() as AggregatedAppFunctionInvoker,
+            Class.forName(inventoryName).getDeclaredConstructor().newInstance() as AggregatedAppFunctionInventory,
+            Class.forName(invokerName).getDeclaredConstructor().newInstance() as AggregatedAppFunctionInvoker,
             androidx.appfunctions.internal.NullTranslatorSelector()
         )
     }
