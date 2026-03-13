@@ -54,4 +54,6 @@ You can ask your assistant to perform the following actions without opening the 
 ### Technical Details
 This feature uses the experimental `androidx.appfunctions` Jetpack library. The `CoffeeAppFunctions` class exposes the capabilities, returning a `@AppFunctionSerializable` `CoffeeStatus` state.
 
-To use this programmatically or to discover it from an agent app, you must have the `android.permission.EXECUTE_APP_FUNCTIONS` permission. Coffee implements `CoffeeAppFunctionService` utilizing the KSP generated `AggregatedAppFunctionInvoker` bindings to safely execute your requests in the background.
+To use this programmatically or to discover it from an agent app, the calling app must have the `android.permission.EXECUTE_APP_FUNCTIONS` permission. Please note that on early Android 16 versions, this is a protected permission granted only to privileged system applications. If you are developing a custom agent or assistant app on an emulator or rooted device, you can bypass this restriction by installing your agent app as a privileged system app or manually granting it (if the protection level allows it in your build).
+
+Coffee implements `CoffeeAppFunctionService` utilizing the KSP generated `AggregatedAppFunctionInvoker` bindings to safely execute your requests in the background.
