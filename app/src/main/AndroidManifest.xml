@@ -85,6 +85,15 @@
         </service>
 
         <service
+                android:name=".CoffeeAppFunctionService"
+                android:exported="true"
+                android:permission="android.permission.BIND_APP_FUNCTION_SERVICE">
+            <intent-filter>
+                <action android:name="android.app.appfunctions.AppFunctionService" />
+            </intent-filter>
+        </service>
+
+        <service
                 android:name=".ForegroundService"
                 android:foregroundServiceType="specialUse"
                 android:enabled="true"
