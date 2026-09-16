@@ -2,8 +2,8 @@ package com.github.muellerma.coffee.tiles
 
 import com.github.muellerma.coffee.ForegroundService
 
-class TimeoutTile : CoffeeTile() {
-    override val action = ForegroundService.ACTION_NEXT_TIMEOUT
+class RestartTile : CoffeeTile() {
+    override val action = ForegroundService.ACTION_RESTART_TIMEOUT
     override val tileState: Int
         get() = runningState()
 }

@@ -1,57 +1,16 @@
 # Coffee
 
-[![Build App](https://github.com/mueller-ma/Coffee/actions/workflows/build.yml/badge.svg)](https://github.com/mueller-ma/Coffee/actions/workflows/build.yml)
-[![CodeFactor](https://www.codefactor.io/repository/github/mueller-ma/coffee/badge)](https://www.codefactor.io/repository/github/mueller-ma/coffee)
-[![Crowdin](https://badges.crowdin.net/coffee-app/localized.svg)](https://crowdin.com/project/coffee-app)
+Coffee keeps the display awake on Android 17 without a launcher activity or settings screen.
 
-This Android app allows you to keep the display awake without having to change the device settings. It can be toggled at various places:
-* A tile in the quick settings, the place that holds the toggles for e.g. Wi-Fi and Bluetooth. Requires Android 7 or higher.
-* A button in the app itself
-* A shortcut on your home screen. It can be created in the app, if your launcher supports it.
+Add any of its controls from the Quick Settings editor:
 
-Coffee can be set as assist app (Device settings => `Apps` => `Default apps` => `Assist app`) and changes it's state when assist is called.
+- **Coffee** — turn Coffee on or off
+- **Next timeout** — select the next timeout, starting Coffee at five minutes when off
+- **Restart timer** — restart the current timeout, starting Coffee when off
+- **Dimming** — toggle whether Android may dim the display normally
 
-[<img alt="Get it on F-Droid" height="80" src="https://raw.githubusercontent.com/mueller-ma/android-common/main/assets/get-it-on-fdroid.png"/>](https://f-droid.org/de/packages/com.github.muellerma.coffee/)[<img alt="Download from GitHub" height="80" src="https://raw.githubusercontent.com/mueller-ma/android-common/main/assets/direct-apk-download.png"/>](https://github.com/mueller-ma/Coffee/releases)
+While Coffee is active, the same timeout and dimming controls are available in its Live Update notification. The dimming button shows **Dim** when it will enable normal inactivity dimming and **Bright** when it will keep the display bright. It does not dim the display immediately, and tapping it resets Android's inactivity timer. When dimming is allowed, wait for the normal screen timeout without touching the display: the screen may dim, but Coffee prevents it from turning off.
 
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="Screenshot" width=200px>
+Tapping the notification itself turns Coffee off. Locking the display also stops Coffee.
 
-## Maintenance notice
-
-From my point of view this app is feature complete. I probably won't add new major features on my own, but I will:
-* Keep dependencies up-to-date
-* Merge new translations
-* Fix bugs
-* Review and merge PRs, even for new features
-
-## Translations
-
-App strings and the app store description can be translated via Crowdin: https://crowdin.com/project/coffee-app
-
-Translations have to be approved before being merged into the app. To become a translator with approval rights or to request a new language, please [poke me on Crowdin](https://crowdin.com/profile/mueller-ma) or open an issue here on GitHub. 
-
-
-## Troubleshooting
-
-Coffee may not work because of an overly aggressive battery saver that is implemented by some OEMs (including Poco, Samsung and Xiaomi).
-In that case please enable "Alternate mode" in the settings.
-
-## Credits
-
-* Feature graphic by https://unsplash.com/@mukulwadhwa
-
-## AI Integration (AppFunctions)
-
-Starting with version 2.25, Coffee includes support for Android 16's AppFunctions! This allows AI assistants (like Gemini) and other authorized agent apps to control Coffee using natural language.
-
-### Supported Features
-You can ask your assistant to perform the following actions without opening the app:
-* **Turn On**: "Turn on Coffee" or "Keep my screen awake"
-* **Turn Off**: "Turn off Coffee"
-* **Toggle**: "Toggle my screen awake state"
-* **Check Status**: "Is Coffee running right now?"
-* **Set Timeout**: "Keep my screen awake for 30 minutes"
-
-### Technical Details
-This feature uses the experimental `androidx.appfunctions` Jetpack library. The `CoffeeAppFunctions` class exposes the capabilities, returning a `@AppFunctionSerializable` `CoffeeStatus` state.
-
-To use this programmatically or to discover it from an agent app, you must have the `android.permission.EXECUTE_APP_FUNCTIONS` permission. Coffee implements `CoffeeAppFunctionService` utilizing the KSP generated `AggregatedAppFunctionInvoker` bindings to safely execute your requests in the background.
+This fork intentionally targets only Android 17 (API 37).

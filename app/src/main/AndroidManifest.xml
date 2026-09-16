@@ -1,59 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:installLocation="internalOnly">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"
-            tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
 
     <application
-            android:name=".CoffeeApplication"
-            android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@drawable/ic_coffee"
             android:label="@string/app_name"
-            android:supportsRtl="true"
-            android:theme="@style/Coffee.AppTheme">
-        <activity
-                android:name=".activities.MainActivity"
-                android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
-            </intent-filter>
-        </activity>
-
-        <activity
-                android:name=".activities.PreferenceActivity"
-                android:label="@string/settings"
-                android:exported="false" />
-
-        <activity
-                android:name=".activities.CoffeeInvisibleActivity"
-                android:launchMode="singleInstance"
-                android:noHistory="true"
-                android:theme="@android:style/Theme.NoDisplay" />
-
-        <receiver
-                android:name=".BootReceiver"
-                android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-        </receiver>
-
+            android:supportsRtl="true">
         <service
                 android:name=".tiles.ToggleTile"
                 android:icon="@drawable/ic_twotone_free_breakfast_24_white"
-                android:label="@string/toggle_coffee"
+                android:label="@string/app_name"
                 android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
                 android:exported="true">
             <intent-filter>
@@ -69,8 +32,36 @@
 
         <service
                 android:name=".tiles.TimeoutTile"
-                android:icon="@drawable/ic_twotone_free_breakfast_24_white"
-                android:label="@string/timeout_next"
+                android:icon="@drawable/ic_baseline_access_time_24"
+                android:label="@string/tile_next"
+                android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data
+                    android:name="android.service.quicksettings.ACTIVE_TILE"
+                    android:value="true" />
+        </service>
+
+        <service
+                android:name=".tiles.RestartTile"
+                android:icon="@drawable/ic_baseline_refresh_24"
+                android:label="@string/tile_restart"
+                android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data
+                    android:name="android.service.quicksettings.ACTIVE_TILE"
+                    android:value="true" />
+        </service>
+
+        <service
+                android:name=".tiles.DimmingTile"
+                android:icon="@drawable/ic_baseline_brightness_medium_24"
+                android:label="@string/tile_dimming"
                 android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
                 android:exported="true">
             <intent-filter>
@@ -87,26 +78,10 @@
         <service
                 android:name=".ForegroundService"
                 android:foregroundServiceType="specialUse"
-                android:enabled="true"
                 android:exported="false">
-            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                    android:value="Foreground service is required to keep wakelock."/>
+            <property
+                    android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                    android:value="Keeps the display on while explicitly enabled by the user." />
         </service>
-
-        <service
-                android:name=".InteractionService"
-                android:permission="android.permission.BIND_VOICE_INTERACTION"
-                android:exported="true">
-            <meta-data
-                    android:name="android.voice_interaction"
-                    android:resource="@xml/voice_interaction_service" />
-
-            <intent-filter>
-                <action android:name="android.service.voice.VoiceInteractionService" />
-            </intent-filter>
-        </service>
-        <service
-                android:name=".InteractionSessionService"
-                android:permission="android.permission.BIND_VOICE_INTERACTION" />
     </application>
 </manifest>

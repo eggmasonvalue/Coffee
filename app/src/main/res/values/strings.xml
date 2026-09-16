@@ -1,56 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Translation instructions can be found in the Readme -->
-<resources
-        xmlns:tools="http://schemas.android.com/tools"
-        tools:ignore="MissingTranslation, ExtraTranslation">
-    <!-- Common strings -->
-    <!-- Feel free to actually translate the title -->
+<resources>
     <string name="app_name">Coffee</string>
-    <string name="turned_on">Turned on</string>
-    <string name="turned_on_remaining">Turned on: %s remaining</string>
-    <string name="turned_off">Turned off</string>
-    <string name="toggle_coffee">Toggle Coffee</string>
 
-    <!-- MainActivity -->
-    <string name="hint_1">This app provides a tile in the quick settings (the place that holds the toggles for e.g. Wi-Fi and Bluetooth) that allows you to keep the display awake without having to change the device settings.</string>
-    <string name="hint_2">Coffee can be stopped by clicking on the tile or the notification or when the screen is turned off manually.</string>
-    <string name="add_toggle_to_home">Add toggle to home screen</string>
-    <string name="add_tile">Add tile</string>
-    <string name="add_toggle_to_home_success">Pinned to home</string>
-    <string name="add_toggle_to_home_no_success">Error pinning to home</string>
-    <string name="notification_permission">Permission to show notifications is required</string>
-    <string name="grant">Grant</string>
-
-    <!-- Notification -->
-    <string name="notification_title_no_timeout">Coffee will keep the display on</string>
-    <string name="notification_title_timeout">Coffee will keep the display on: %s</string>
+    <string name="notification_channel_description">Screen-on status and controls</string>
+    <string name="notification_title">Screen on</string>
     <string name="tap_to_turn_off">Tap to turn off</string>
-    <string name="allow_dimming_enable">Enable dimming</string>
-    <string name="allow_dimming_disable">Disable dimming</string>
-    <string name="timeout_next">Next timeout</string>
+    <string name="notification_chip_on">On</string>
 
-    <!-- Settings -->
-    <string name="settings">Settings</string>
-    <string name="timeout">Stop Coffee automatically</string>
-    <string name="timeout_infinity">No timeout</string>
-    <string name="timeout_5_minutes">5 minutes</string>
-    <string name="timeout_15_minutes">15 minutes</string>
-    <string name="timeout_30_minutes">30 minutes</string>
-    <string name="timeout_60_minutes">1 hour</string>
-    <string name="timeout_120_minutes">2 hours</string>
+    <string name="action_next">Next</string>
+    <string name="action_restart">Restart</string>
+    <string name="action_dim">Dim</string>
+    <string name="action_bright">Bright</string>
 
-    <string name="allow_dimming_title">Allow screen dimming</string>
-    <string name="allow_dimming_summary">Screen will be dimmed based on the system screen timeout</string>
-
-    <string name="alternate_mode_title">Alternate mode</string>
-    <string name="alternate_mode_summary">Turn on alternate mode only if Coffee doesn\'t keep the screen on; other features may not work. The alternate mode will temporarily increase the system screen timeout.</string>
-    <string name="alternate_mode_permissions">Alternate mode requires this permission</string>
-    <string name="alternate_mode_unable_to_set_old_timeout">Coffee couldn\'t set the previous timeout</string>
-
-    <!-- About menu -->
-    <string name="about">About Coffee</string>
-    <string name="error_no_browser_found">No browser found</string>
-    <string name="aboutLibraries_description_special1_name" translatable="false" tools:ignore="UnusedResources">GitHub</string>
-    <string name="aboutLibraries_description_special2_name" translatable="false" tools:ignore="UnusedResources">F-Droid</string>
-    <string name="aboutLibraries_description_special3_name" translatable="false" tools:ignore="UnusedResources">Crowdin</string>
+    <string name="tile_next">Next timeout</string>
+    <string name="tile_restart">Restart timer</string>
+    <string name="tile_dimming">Dimming</string>
 </resources>

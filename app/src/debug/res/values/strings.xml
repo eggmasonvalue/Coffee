@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Translation instructions can be found in the Readme -->
-<resources
-        xmlns:tools="http://schemas.android.com/tools"
-        tools:ignore="MissingTranslation, ExtraTranslation">
-    <!-- App name for debug builds -->
+<resources>
     <string name="app_name">Coffee Debug</string>
 </resources>
