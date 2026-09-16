@@ -20,11 +20,8 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
-          distribution: 'adopt'
+          distribution: 'temurin'
           java-version: 21
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
 
       - name: Install Android 17 SDK
         run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
