@@ -1,5 +1,6 @@
 plugins {
     id "com.android.application"
+    id "com.google.devtools.ksp"
 }
 
 android {
@@ -10,8 +11,8 @@ android {
         applicationId = "com.github.muellerma.coffee"
         minSdk = 37
         targetSdk = 37
-        versionCode = 49
-        versionName = "3.1"
+        versionCode = 50
+        versionName = "3.2"
     }
 
     buildTypes {
@@ -34,5 +35,26 @@ android {
     lint {
         abortOnError = true
         warningsAsErrors = true
+        disable 'AndroidGradlePluginVersion', 'NewerVersionAvailable', 'GradleDependency'
     }
+
+    sourceSets {
+        debug {
+            assets.srcDirs += layout.buildDirectory.dir("generated/ksp/debug/resources/assets")
+        }
+        release {
+            assets.srcDirs += layout.buildDirectory.dir("generated/ksp/release/resources/assets")
+        }
+    }
+}
+
+tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }.configureEach {
+    def variantName = it.name.substring(5, it.name.length() - 6) // e.g. "Debug"
+    dependsOn("ksp${variantName}Kotlin")
+}
+
+dependencies {
+    implementation "androidx.appfunctions:appfunctions:1.0.0-alpha12"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"
+    ksp "androidx.appfunctions:appfunctions-compiler:1.0.0-alpha12"
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:installLocation="internalOnly">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -82,6 +83,22 @@
             <property
                     android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                     android:value="Keeps the display on while explicitly enabled by the user." />
+        </service>
+
+        <service
+                android:name=".appfunctions.CoffeeAppFunctionService"
+                android:permission="android.permission.BIND_APP_FUNCTION_SERVICE"
+                android:exported="true"
+                tools:ignore="MissingClass">
+            <intent-filter>
+                <action android:name="android.app.appfunctions.AppFunctionService" />
+            </intent-filter>
+            <property
+                    android:name="android.app.appfunctions.v2"
+                    android:value="coffee_app_functions.xml" />
+            <property
+                    android:name="android.app.appfunctions"
+                    android:value="coffee_app_functions.xml" />
         </service>
     </application>
 </manifest>

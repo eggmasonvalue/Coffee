@@ -17,6 +17,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
 import android.os.SystemClock
+import com.github.muellerma.coffee.appfunctions.ScreenAwakeState
 import com.github.muellerma.coffee.tiles.CoffeeTile
 
 /** Keeps the display awake until stopped manually, by timeout, or by locking the display. */
@@ -24,8 +25,6 @@ class ForegroundService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private var wakeLock: PowerManager.WakeLock? = null
     private var screenOffReceiverRegistered = false
-    private var startedAt = 0L
-    private var deadline: Long? = null
 
     private val stopAtDeadline = Runnable { stopSession() }
     private val refreshNotification = object : Runnable {
@@ -52,14 +51,30 @@ class ForegroundService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
+            ACTION_START_OR_UPDATE -> {
+                if (intent.hasExtra(EXTRA_DURATION_MINUTES)) {
+                    sessionDurationMinutes = intent.getIntExtra(EXTRA_DURATION_MINUTES, 0)
+                }
+                if (intent.hasExtra(EXTRA_ALLOW_DIMMING)) {
+                    sessionAllowsDimming = intent.getBooleanExtra(EXTRA_ALLOW_DIMMING, true)
+                }
+                if (isRunning) {
+                    acquireWakeLock()
+                    restartTimer()
+                } else {
+                    startSession()
+                }
+            }
             ACTION_STOP -> stopSession()
             ACTION_TOGGLE -> if (isRunning) stopSession() else startSession()
             ACTION_NEXT_TIMEOUT -> {
+                sessionDurationMinutes = null
                 CoffeeSettings.selectNextTimeout(this, startAtFiveMinutes = !isRunning)
                 if (isRunning) restartTimer() else startSession()
             }
             ACTION_RESTART_TIMEOUT -> if (isRunning) restartTimer() else startSession()
             ACTION_TOGGLE_DIMMING -> {
+                sessionAllowsDimming = null
                 CoffeeSettings.toggleDimming(this)
                 if (isRunning) {
                     acquireWakeLock()
@@ -91,7 +106,7 @@ class ForegroundService : Service() {
     @Suppress("DEPRECATION")
     private fun acquireWakeLock() {
         releaseWakeLock()
-        val level = if (CoffeeSettings.allowsDimming(this)) {
+        val level = if (currentAllowsDimming(this)) {
             PowerManager.SCREEN_DIM_WAKE_LOCK
         } else {
             PowerManager.SCREEN_BRIGHT_WAKE_LOCK
@@ -109,7 +124,8 @@ class ForegroundService : Service() {
         handler.removeCallbacks(refreshNotification)
 
         startedAt = SystemClock.elapsedRealtime()
-        deadline = CoffeeSettings.timeoutMinutes(this).takeIf { it > 0 }
+        val timeout = currentDurationMinutes(this)
+        deadline = timeout.takeIf { it > 0 }
             ?.let { startedAt + it * 60_000L }
         deadline?.let {
             handler.postDelayed(stopAtDeadline, (it - SystemClock.elapsedRealtime()).coerceAtLeast(0))
@@ -121,6 +137,8 @@ class ForegroundService : Service() {
 
     private fun stopSession() {
         isRunning = false
+        sessionDurationMinutes = null
+        sessionAllowsDimming = null
         handler.removeCallbacksAndMessages(null)
         deadline = null
         releaseWakeLock()
@@ -138,7 +156,10 @@ class ForegroundService : Service() {
 
     override fun onDestroy() {
         isRunning = false
+        sessionDurationMinutes = null
+        sessionAllowsDimming = null
         handler.removeCallbacksAndMessages(null)
+        deadline = null
         releaseWakeLock()
         unregisterScreenOffReceiver()
         CoffeeTile.requestStateUpdates(this)
@@ -225,7 +246,7 @@ class ForegroundService : Service() {
                 Notification.Action.Builder(
                     Icon.createWithResource(this, R.drawable.ic_baseline_brightness_medium_24),
                     getString(
-                        if (CoffeeSettings.allowsDimming(this)) R.string.action_bright else R.string.action_dim
+                        if (currentAllowsDimming(this)) R.string.action_bright else R.string.action_dim
                     ),
                     serviceIntent(ACTION_TOGGLE_DIMMING, 3)
                 ).build()
@@ -253,6 +274,10 @@ class ForegroundService : Service() {
         )
 
     companion object {
+        const val ACTION_START_OR_UPDATE = "com.github.muellerma.coffee.action.START_OR_UPDATE"
+        const val EXTRA_DURATION_MINUTES = "extra_duration_minutes"
+        const val EXTRA_ALLOW_DIMMING = "extra_allow_dimming"
+
         const val ACTION_TOGGLE = "com.github.muellerma.coffee.action.TOGGLE"
         private const val ACTION_STOP = "com.github.muellerma.coffee.action.STOP"
         const val ACTION_NEXT_TIMEOUT = "com.github.muellerma.coffee.action.NEXT_TIMEOUT"
@@ -267,5 +292,85 @@ class ForegroundService : Service() {
         var isRunning: Boolean = false
             private set
 
+        @Volatile
+        var sessionDurationMinutes: Int? = null
+            private set
+
+        @Volatile
+        var sessionAllowsDimming: Boolean? = null
+            private set
+
+        @Volatile
+        var deadline: Long? = null
+            private set
+
+        @Volatile
+        var startedAt: Long = 0L
+            private set
+
+        val remainingSeconds: Long?
+            get() = if (isRunning) {
+                deadline?.let { (it - SystemClock.elapsedRealtime()).coerceAtLeast(0) / 1000 }
+            } else {
+                null
+            }
+
+        fun currentAllowsDimming(context: Context): Boolean =
+            sessionAllowsDimming ?: CoffeeSettings.allowsDimming(context)
+
+        fun currentDurationMinutes(context: Context): Int =
+            sessionDurationMinutes ?: CoffeeSettings.timeoutMinutes(context)
+
+        fun currentState(context: Context): ScreenAwakeState {
+            val mode = if (currentAllowsDimming(context)) "DIM" else "BRIGHT"
+            return ScreenAwakeState(
+                isAwake = isRunning,
+                remainingSeconds = remainingSeconds,
+                mode = mode
+            )
+        }
+
+        fun startOrUpdate(
+            context: Context,
+            durationMinutes: Int?,
+            allowDimming: Boolean?
+        ): ScreenAwakeState {
+            if (durationMinutes != null) {
+                sessionDurationMinutes = durationMinutes
+            }
+            if (allowDimming != null) {
+                sessionAllowsDimming = allowDimming
+            }
+            val intent = Intent(context, ForegroundService::class.java).apply {
+                action = ACTION_START_OR_UPDATE
+                if (durationMinutes != null) putExtra(EXTRA_DURATION_MINUTES, durationMinutes)
+                if (allowDimming != null) putExtra(EXTRA_ALLOW_DIMMING, allowDimming)
+            }
+            context.startForegroundService(intent)
+
+            val targetDuration = durationMinutes ?: currentDurationMinutes(context)
+            val calculatedRemaining = if (targetDuration > 0) targetDuration * 60L else null
+            val mode = if (allowDimming ?: currentAllowsDimming(context)) "DIM" else "BRIGHT"
+            return ScreenAwakeState(
+                isAwake = true,
+                remainingSeconds = calculatedRemaining,
+                mode = mode
+            )
+        }
+
+        fun stop(context: Context): ScreenAwakeState {
+            val intent = Intent(context, ForegroundService::class.java).apply {
+                action = ACTION_STOP
+            }
+            context.startForegroundService(intent)
+            sessionDurationMinutes = null
+            sessionAllowsDimming = null
+            val mode = if (CoffeeSettings.allowsDimming(context)) "DIM" else "BRIGHT"
+            return ScreenAwakeState(
+                isAwake = false,
+                remainingSeconds = null,
+                mode = mode
+            )
+        }
     }
 }
