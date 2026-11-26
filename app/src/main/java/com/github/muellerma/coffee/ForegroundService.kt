@@ -79,6 +79,7 @@ class ForegroundService : Service() {
                 if (isRunning) {
                     acquireWakeLock()
                     updateNotification()
+                    CoffeeTile.updateListeningTiles()
                 } else {
                     stopSession()
                 }
@@ -132,7 +133,7 @@ class ForegroundService : Service() {
             handler.postDelayed(refreshNotification, NOTIFICATION_REFRESH_MILLIS)
         }
         updateNotification()
-        CoffeeTile.requestStateUpdates(this)
+        CoffeeTile.updateListeningTiles()
     }
 
     private fun stopSession() {
@@ -145,7 +146,7 @@ class ForegroundService : Service() {
         unregisterScreenOffReceiver()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
-        CoffeeTile.requestStateUpdates(this)
+        CoffeeTile.updateListeningTiles()
     }
 
     private fun releaseWakeLock() {
@@ -162,7 +163,7 @@ class ForegroundService : Service() {
         deadline = null
         releaseWakeLock()
         unregisterScreenOffReceiver()
-        CoffeeTile.requestStateUpdates(this)
+        CoffeeTile.updateListeningTiles()
         super.onDestroy()
     }
 

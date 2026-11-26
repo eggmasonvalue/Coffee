@@ -15,7 +15,8 @@ class DimmingTile : CoffeeTile() {
         } else {
             performClickHaptic()
             CoffeeSettings.toggleDimming(this)
-            requestStateUpdates(this)
+            updateState()
+            updateListeningTiles()
         }
     }
 }

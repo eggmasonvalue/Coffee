@@ -1,7 +1,5 @@
 package com.github.muellerma.coffee.tiles
 
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.os.VibrationEffect
 import android.os.VibratorManager
@@ -14,6 +12,11 @@ import java.util.WeakHashMap
 abstract class CoffeeTile : TileService() {
     protected abstract val action: String
     protected abstract val tileState: Int
+
+    override fun onTileAdded() {
+        super.onTileAdded()
+        updateState()
+    }
 
     override fun onStartListening() {
         super.onStartListening()
@@ -31,7 +34,7 @@ abstract class CoffeeTile : TileService() {
         super.onDestroy()
     }
 
-    private fun updateState() {
+    protected fun updateState() {
         qsTile?.apply {
             state = tileState
             subtitle = null
@@ -53,20 +56,9 @@ abstract class CoffeeTile : TileService() {
 
     companion object {
         private val listeningTiles = Collections.newSetFromMap(WeakHashMap<CoffeeTile, Boolean>())
-        private val tileClasses = arrayOf(
-            ToggleTile::class.java,
-            TimeoutTile::class.java,
-            RestartTile::class.java,
-            DimmingTile::class.java
-        )
 
-        fun requestStateUpdates(context: Context) {
-            // requestListeningState() may do nothing when SystemUI already has a tile bound.
-            // Update bound instances synchronously, then request bindings for the rest.
+        fun updateListeningTiles() {
             listeningTiles.toList().forEach(CoffeeTile::updateState)
-            tileClasses.forEach {
-                TileService.requestListeningState(context, ComponentName(context, it))
-            }
         }
 
         fun runningState(): Int =
